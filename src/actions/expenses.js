@@ -1,35 +1,33 @@
 import uuid from 'uuid';
 import database from '../firebase/firebase';
+
 // ADD_EXPENSE
-const addExpense = (expense) => ({
+export const addExpense = (expense) => ({
   type: 'ADD_EXPENSE',
   expense
 });
 
 export const startAddExpense = (expenseData = {}) => {
   return (dispatch) => {
-
-    const { 
+    const {
       description = '',
       note = '',
       amount = 0,
-      createdAt = 0 
+      createdAt = 0
     } = expenseData;
-    
     const expense = { description, note, amount, createdAt };
 
-    return database.ref('expenses').push(expense)
-    .then((ref) => {
+    return database.ref('expenses').push(expense).then((ref) => {
       dispatch(addExpense({
         id: ref.key,
-        ...expense 
+        ...expense
       }));
     });
   };
 };
 
 // REMOVE_EXPENSE
-const removeExpense = ({ id } = {}) => ({
+export const removeExpense = ({ id } = {}) => ({
   type: 'REMOVE_EXPENSE',
   id
 });
@@ -43,15 +41,19 @@ export const startRemoveExpense = ({ id } = {}) => {
 };
 
 // EDIT_EXPENSE
-const editExpense = (id, updates) => ({
+export const editExpense = (id, updates) => ({
   type: 'EDIT_EXPENSE',
   id,
   updates
 });
 
-
-
-
+export const startEditExpense = (id, updates) => {
+  return (dispatch) => {
+    return database.ref(`expenses/${id}`).update(updates).then(() => {
+      dispatch(editExpense(id, updates));
+    });
+  };
+};
 
 // SET_EXPENSES
 export const setExpenses = (expenses) => ({
@@ -75,6 +77,3 @@ export const startSetExpenses = () => {
     });
   };
 };
-
-
-export { addExpense, removeExpense, editExpense };
